@@ -4,6 +4,7 @@ from app.schemas import BookCreate, BookRead
 from datetime import datetime, timezone
 from app.exceptions import BookNotFound
 from app.routers.books import router
+from app.routers.books import _db
 
 app = FastAPI(
     title="BookShelf API",
@@ -32,3 +33,8 @@ def book_not_found_handler(request, exc: BookNotFound):
 @app.get("/health")
 def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/page", response_model_exclude_none=True, response_model=list[BookRead])
+def get_pagination():
+    return list(_db.values())

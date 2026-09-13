@@ -1,0 +1,301 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "BookShelf API",
+        "summary": "Manage a personal library and enrich it with OpenLibrary API",
+        "description": "A simple API for managing a bookshelf.",
+        "contact": {
+            "name": "My Team",
+            "email": "myteam@example.com"
+        },
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/books/{book_id}": {
+            "get": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Get a Book",
+                "description": "Fetches the information about the book using a book id",
+                "operationId": "get_book_books__book_id__get",
+                "parameters": [
+                    {
+                        "name": "book_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Book Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Book Fetched Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookRead"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Book Not Found"
+                    },
+                    "422": {
+                        "description": "Validation Failed"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Delete a book",
+                "description": "Delete a book from the database using book id",
+                "operationId": "delete_book_books__book_id__delete",
+                "parameters": [
+                    {
+                        "name": "book_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Book Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Book Deleted Successfully"
+                    },
+                    "404": {
+                        "description": "Book with the provided id not found"
+                    },
+                    "422": {
+                        "description": "Validation Failed"
+                    }
+                }
+            }
+        },
+        "/books/": {
+            "get": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Get All Books",
+                "description": "Fetch all the books from the database",
+                "operationId": "list_books_books__get",
+                "responses": {
+                    "200": {
+                        "description": "Fetched All Books Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/BookRead"
+                                    },
+                                    "type": "array",
+                                    "title": "Response List Books Books  Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/books": {
+            "post": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Create a Book",
+                "description": "Adds a book to a shelf. Titles are trimmed; ISBNs are not verified",
+                "operationId": "create_book_books_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookCreate"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Book Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BookRead"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "A book with this isbn already exists"
+                    },
+                    "422": {
+                        "description": "Validation Failed"
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "summary": "Health Check",
+                "operationId": "health_check_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    },
+                                    "type": "object",
+                                    "title": "Response Health Check Health Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/page": {
+            "get": {
+                "summary": "Get Pagination",
+                "operationId": "get_pagination_page_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/BookRead"
+                                    },
+                                    "type": "array",
+                                    "title": "Response Get Pagination Page Get"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "BookCreate": {
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "title": "Title"
+                    },
+                    "author": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "title": "Author"
+                    },
+                    "year": {
+                        "type": "integer",
+                        "maximum": 2100.0,
+                        "minimum": 0.0,
+                        "title": "Year"
+                    },
+                    "isbn": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Isbn"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "title",
+                    "author",
+                    "year"
+                ],
+                "title": "BookCreate",
+                "examples": [
+                    {
+                        "author": "Frank Herbert",
+                        "title": "Dune",
+                        "year": 1965
+                    }
+                ]
+            },
+            "BookRead": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "author": {
+                        "type": "string",
+                        "title": "Author"
+                    },
+                    "year": {
+                        "type": "integer",
+                        "title": "Year"
+                    },
+                    "isbn": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Isbn"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "title",
+                    "author",
+                    "year",
+                    "created_at"
+                ],
+                "title": "BookRead"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Books",
+            "description": "Create, Read, Update, Delete Books"
+        },
+        {
+            "name": "default",
+            "description": "Liveliness and Readiness probes"
+        }
+    ]
+}
