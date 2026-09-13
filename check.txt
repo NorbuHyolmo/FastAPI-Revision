@@ -1,0 +1,42 @@
+backend is a program that takes http request and returns http responses 
+
+get  fetch data idempotent 
+post create non idempotent retry posts 
+put update idempotent completely replace a resource 
+patch non idempotent partial updates 
+delete idempotent 
+
+
+Why PATCH isn't automatically idempotentUnlike a total overwrite, 
+a partial update (PATCH) can modify data relative to its current state.
+For example, 
+if you send a PATCH request with instructions like { "views": "+1" } or [ { "op": "add", "path": "/tags", "value": "admin" } ]:
+First request: Increments views from 0 to 1.Second request: Increments views from 1 to 2.
+
+status code 
+200 - successful get, put,patch 
+201 - created successfully post 
+204 - successfully deleted 
+400 - malformed input/ format bigreko cha and stuff like that 
+401 - not authenticated 
+403 - authenticated but not authorized 
+404 - not found 
+409 - conflict/duplicate. trying to create already existing data 
+422 - data validation error 
+
+500 - code ma bug 
+503 - server down 
+
+
+model nouns - things 
+verb - action http methods 
+
+
+- users/{user_id}/orders | method(get)
+- orders/order_id | method(patch)
+- orders/order_id | method(patch)
+
+
+pip install fastapi "uvicorn[standard]" optional dependencies install faster lookup and stuff like that 
+
+
