@@ -8,7 +8,14 @@ from app.routers.books import router
 app = FastAPI(
     title="BookShelf API",
     version="1.0.0",
+    summary="Manage a personal library and enrich it with OpenLibrary API",
     description="A simple API for managing a bookshelf.",
+    contact={"name": "My Team", "email": "myteam@example.com"},
+    license_info={"name": "MIT"},
+    openapi_tags=[
+        {"name": "Books", "description": "Create, Read, Update, Delete Books"},
+        {"name": "default", "description": "Liveliness and Readiness probes"},
+    ],
 )
 
 app.include_router(router)

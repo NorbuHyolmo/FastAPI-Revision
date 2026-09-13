@@ -13,6 +13,12 @@ class BookCreate(BaseModel):
     def strip_title(cls, value: str) -> str:
         return value.strip()
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [{"title": "Dune", "author": "Frank Herbert", "year": 1965}]
+        }
+    }
+
 
 class BookRead(BaseModel):
     id: int
