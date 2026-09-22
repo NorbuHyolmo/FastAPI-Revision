@@ -27,3 +27,17 @@ class Book(Base):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     author: Mapped["Author"] = relationship(back_populates="books")
+    notes: Mapped[list["Note"]] = relationship(
+        back_populates="book", cascade="all, delete-orphan"
+    )
+
+
+class Note(Base):
+    __tablename__ = "notes"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(200))
+    summary: Mapped[str] = mapped_column(String(200), default=None)
+    book_id: Mapped[int] = mapped_column(ForeignKey("books.id", ondelete="CASCADE"))
+
+    book: Mapped[Book] = relationship(back_populates="notes")

@@ -2,14 +2,14 @@ from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
-
+from sqlalchemy.orm import Session
 from app.exceptions import BookNotFound
 from app.schemas import BookCreate, BookRead
-
-_db: dict[int, str] = {}
-_next_id = 1
+from app.db import get_db
+from app.crud import crud
 
 router = APIRouter(prefix="/books", tags=["Books"])
+DB = Annotated[Session, Depends(get_db)]
 
 
 @router.get(
@@ -23,17 +23,8 @@ router = APIRouter(prefix="/books", tags=["Books"])
         422: {"description": "Validation Failed"},
     },
 )
-def get_book(book_id: int):
-    if book_id not in _db:
-        raise BookNotFound(book_id)
-    return _db[book_id]
-
-
-def get_all_books():
-    return list(_db.values())
-
-
-books = Annotated[list, Depends(get_all_books)]
+def get_book(db: DB, book_id: int):
+    return crud.get(db, book_id)
 
 
 @router.get(
@@ -43,8 +34,8 @@ books = Annotated[list, Depends(get_all_books)]
     description="Fetch all the books from the database",
     responses={200: {"description": "Fetched All Books Successfully"}},
 )
-def list_books(books: books):
-    return books
+def list_books(db: DB, skip: int = 0, limit: int = 20, q: str | None = None):
+    return crud.list_(db, skip, limit, q)
 
 
 @router.post(
@@ -59,15 +50,8 @@ def list_books(books: books):
         422: {"description": "Validation Failed"},
     },
 )
-def create_book(book: BookCreate):
-    global _next_id
-    record = book.model_dump() | {
-        "id": _next_id,
-        "created_at": datetime.now(timezone.utc),
-    }
-    _db[_next_id] = record
-    _next_id += 1
-    return record
+def create_book(db: DB, book: BookCreate):
+    return crud.create(db, book)
 
 
 @router.delete(
@@ -81,9 +65,5 @@ def create_book(book: BookCreate):
         422: {"description": "Validation Failed"},
     },
 )
-def delete_book(book_id: int):
-    if book_id in _db:
-        del _db[book_id]
-        return {"message": "Book deleted successfully."}
-    else:
-        raise BookNotFound(book_id)
+def delete_book(db: DB, book_id: int):
+    return crud.delete(db, book_id)

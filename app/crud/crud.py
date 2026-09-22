@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from app.models import Book, Author
 from app.exceptions import BookNotFound, DuplicateISBN
-from schemas import BookCreate, BookUpdate
+from app.schemas import BookCreate, BookUpdate
 
 
 def get(db: Session, book_id: int) -> Book:
@@ -20,19 +20,25 @@ def list_(
     stmt = select(Book).options(selectinload(Book.author))
 
     if q:
-        stmt = stmt.wherE(Book.title.ilike(f"%{q}%"))
+        stmt = stmt.where(Book.title.ilike(f"%{q}%"))
 
-    stmt = stmt.order_by(Book.created_At.desc()).offset(skip).limit(limit)
+    stmt = stmt.order_by(Book.id.desc()).offset(skip).limit(limit)
 
     return db.scalars(stmt).all()
 
 
 def create(db: Session, data: BookCreate) -> Book:
-    book = Book(**data.model_dump())
+    author = db.scalar(select(Author).where(Author.name == data.author))
+    if author is None:
+        author = Author(name=data.author)
+        db.add(author)
+
+    book = Book(**data.model_dump(exclude={"author"}), author=author)
     db.add(book)
     try:
         db.commit()
     except IntegrityError as exc:
+        db.rollback()
         raise DuplicateISBN(data.isbn) from exc
 
     db.refresh(book)
@@ -45,7 +51,11 @@ def delete(db: Session, book_id: int) -> None:
     db.commit()
 
 
-# def update(db: Session, book_id: int, data: BookUpdate) -> Book:
-#     book = get(db, book_id)
-#     for field, value in data.model_dump(exclude_unset=True).items():
-#         setattr(book, field, value)
+def update(db: Session, book_id: int, data: BookUpdate) -> Book:
+    book = get(db, book_id)
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(book, field, value)
+
+    db.commit()
+    db.refresh(book)
+    return book

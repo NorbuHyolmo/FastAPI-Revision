@@ -21,7 +21,7 @@ class BookCreate(BaseModel):
     }
 
 
-class BookUpate(BaseModel):
+class BookUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=100)
     author: str | None = Field(default=None, min_length=1, max_length=100)
     year: int | None = Field(default=None, ge=0, le=2100)

@@ -2,7 +2,7 @@ from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 
 from app.exceptions import BookNotFound
-from app.routers.books import _db, router
+from app.routers.books import router, DB
 from app.schemas import BookRead
 
 app = FastAPI(
@@ -34,6 +34,6 @@ def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/page", response_model_exclude_none=True, response_model=list[BookRead])
-def get_pagination():
-    return list(_db.values())
+# @app.get("/page", response_model_exclude_none=True, response_model=list[BookRead])
+# def get_pagination():
+#     return list(DB.values())
