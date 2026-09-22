@@ -39,4 +39,9 @@ verb - action http methods
 
 pip install fastapi "uvicorn[standard]" optional dependencies install faster lookup and stuff like that 
 
+we've built get/post/delete no edit for now 
+we've separated the books into a new router 
+referenced them in main py using 
 
+# from app.routers.books import router 
+# app.include_router(router)

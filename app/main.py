@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Query, status
+from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
-from app.schemas import BookCreate, BookRead
-from datetime import datetime, timezone
+
 from app.exceptions import BookNotFound
-from app.routers.books import router
-from app.routers.books import _db
+from app.routers.books import _db, router
+from app.schemas import BookRead
 
 app = FastAPI(
     title="BookShelf API",

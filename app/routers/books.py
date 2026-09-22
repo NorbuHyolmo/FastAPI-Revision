@@ -1,8 +1,10 @@
-from fastapi import APIRouter, status, Depends
-from app.schemas import BookCreate, BookRead
-from app.exceptions import BookNotFound
 from datetime import datetime, timezone
 from typing import Annotated
+
+from fastapi import APIRouter, Depends, status
+
+from app.exceptions import BookNotFound
+from app.schemas import BookCreate, BookRead
 
 _db: dict[int, str] = {}
 _next_id = 1

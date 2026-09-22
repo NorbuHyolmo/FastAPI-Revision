@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class BookCreate(BaseModel):
@@ -18,6 +19,12 @@ class BookCreate(BaseModel):
             "examples": [{"title": "Dune", "author": "Frank Herbert", "year": 1965}]
         }
     }
+
+
+class BookUpate(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=100)
+    author: str | None = Field(default=None, min_length=1, max_length=100)
+    year: int | None = Field(default=None, ge=0, le=2100)
 
 
 class BookRead(BaseModel):
