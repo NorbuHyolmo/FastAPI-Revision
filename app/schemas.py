@@ -1,6 +1,23 @@
 from datetime import datetime
-
+from typing import Generic, TypeVar
 from pydantic import BaseModel, Field, field_validator
+
+
+T = TypeVar("T")
+
+
+class Page(BaseModel, Generic[T]):
+    items: list[T]
+    total: int
+    skip: int
+    limit: int
+
+
+class AuthorResponse(BaseModel):
+    id: int
+    name: str
+
+    model_config = {"from_attributes": True}
 
 
 class BookCreate(BaseModel):
@@ -30,7 +47,7 @@ class BookUpdate(BaseModel):
 class BookRead(BaseModel):
     id: int
     title: str
-    author: str
+    author: AuthorResponse
     year: int
     isbn: str | None = None
     created_at: datetime
